@@ -7,12 +7,18 @@ def lambda_handler(event, context):
     
     conn = pyodbc.connect('DRIVER={ODBC Driver 17 for SQL Server};SERVER=stsdb.cm6uzfkbt628.us-east-1.rds.amazonaws.com,1433;DATABASE=SlayTheSpireStats;UID=admin;PWD=FLycb7A2hEUWV*NmpZcb')
     cursor = conn.cursor()
-        
+    message = 'Success'
+       
+    
     if event['TYPE'] == 'INSERT':
         insert_row(cursor, event)
-        
+    elif event['TYPE'] == 'QUERY':
+        message = [] 
+        cursor.execute(event['QUERY'])
+        for row in cursor.fetchall():
+            message.append(list(row))
+            
     statusCode = 200
-    message = 'Success'
     try:
         conn.commit()
     except MySQLdb.IntegrityError:
