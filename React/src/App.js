@@ -1,26 +1,28 @@
-import React, { useState } from 'react';
+import React from 'react';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { Navigate } from 'react-router-dom';
+import Home from './Home';
+import Login from './Login'
+import Signup from './Signup'
 import './App.css';
 
 function App() {
-    const [status, setStatus] = useState('Not Connected');
 
-    const checkConnection = () => {
-        fetch('/api/check-connection')
-            .then(res => res.text())
-            .then(data => setStatus(data))
-            .catch(err => console.error('Error checking connection:', err));
-    };
-
-    const closeConnection = () => {
-        setStatus('Not Connected');
-    };
+    const isLoggedIn = sessionStorage.getItem('isLoggedIn');
 
     return (
-        <div>
-            <h1>Connection Status: {status}</h1>
-            <button onClick={checkConnection}>Open Connection</button>
-            <button onClick={closeConnection}>Close Connection</button>
-        </div>
+        <Router>
+            <Routes>
+                <Route exact path="/" element={<Login />} />
+                <Route path="/signup" element={<Signup />} />
+                <Route path="/home" element={<Home />} />
+                <Route path="*" element={isLoggedIn ? <Navigate to="/home" /> : <Navigate to="/" />} />
+                <Route
+                    path="*"
+                    element={isLoggedIn ? <Home /> : <Login />}
+                />
+            </Routes>
+        </Router>
     );
 }
 

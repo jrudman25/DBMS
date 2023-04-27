@@ -1,0 +1,15 @@
+{
+  "short_name": "SpireStats",
+  "name": "Slay the Spire Stats",
+  "icons": [
+    {
+      "src": "firelogo.webp",
+      "type": "image/webp",
+      "sizes": "1920x1097"
+    }
+  ],
+  "start_url": ".",
+  "display": "standalone",
+  "theme_color": "#000000",
+  "background_color": "#ffffff"
+}
