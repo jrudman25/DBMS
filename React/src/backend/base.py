@@ -8,15 +8,15 @@ from flask import Flask, render_template
 conn = None
 cursor = None
 id_arr = []
-  
-  
+
+
 # Initializing flask app
 app = Flask(__name__)
-  
+
 def execute(line):
     global conn
     global cursor
-    
+
     try:
         cursor = conn.cursor()
         cursor.execute(line)
@@ -32,7 +32,7 @@ def parse(filename):
     global cursor
     file1 = open(filename, 'r')
     Lines = file1.read().split(";")
-    
+
     Lines = [line+";" for line in Lines]
 
     for line in Lines:
@@ -51,7 +51,7 @@ def open_connection(username, password):
         #     INSERT INTO [SlayTheSpireStats].[dbo].[RUN] ([Time], [SuccessOrFail], [Duration], [Run_ID], [GoldBalance], [MaxFloorReached])
         #     VALUES ('2005-04-12', 1, '14:30:00.1230000', 0, 234, 5);""")
         # conn.commit()
-        
+
         # Use when parser works
         #parser.parse("data/run_info.txt", conn)
 
@@ -83,7 +83,7 @@ def get_time():
 def get_all():
     username = "admin"
     password = "FLycb7A2hEUWV*NmpZcb"
-    
+
     try:
         open_connection(username, password)
         cursor.execute("SELECT * FROM [SlayTheSpireStats].[dbo].[RUN]")
@@ -101,10 +101,10 @@ def get_all():
             name = i[6]
             if i[1] == 1:
                 wins = wins + 1
-        
+
         Gold = gold / total
         close_connection()
-        
+
         return {
             "Gold":Gold,
             "Floor":floor/total,
@@ -126,7 +126,7 @@ def get_all():
 def get_admin():
     username = "admin"
     password = "FLycb7A2hEUWV*NmpZcb"
-    
+
     try:
         open_connection(username, password)
         cursor.execute("""
@@ -150,7 +150,7 @@ def get_admin():
 def get_relics():
     username = "admin"
     password = "FLycb7A2hEUWV*NmpZcb"
-    
+
     try:
         open_connection(username, password)
         cursor.execute("""
@@ -185,7 +185,7 @@ def get_runs():
         gold = []
         maxfloor = []
         username = []
-        
+
 
         for i in ans:
             date.append(i[0])
@@ -222,4 +222,3 @@ if __name__ == '__main__':
     # python parser.py data/run_info.txt admin FLycb7A2hEUWV*NmpZcb
 
     app.run(debug=True)
-

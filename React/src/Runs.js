@@ -31,7 +31,7 @@ function Runs() {
 
 
     useEffect(() => {
-        // Using fetch to fetch the api from 
+        // Using fetch to fetch the api from
         // flask server it will be redirected to proxy
         fetch("/allRuns").then((res) =>
             res.json().then((data) => {
@@ -101,9 +101,9 @@ function Runs() {
         alert(`run ${fileName} uploaded`);
     };
 
-    const showHome = async () =>{ 
+    const showHome = async () =>{
         navigate('/home');
-      }
+    }
 
     return (
         <>
@@ -132,14 +132,14 @@ function Runs() {
                         }}
                     >
                         <table className="Live-games">
-                                {/*https://www.telerik.com/blogs/beginners-guide-loops-in-react-jsx */}
-                                {runs.Date.map(runs => (
+                            {/*https://www.telerik.com/blogs/beginners-guide-loops-in-react-jsx */}
+                            {runs.Date.map(runs => (
                                 <tr>
-                                <th>{runs}</th>
-                            </tr>
+                                    <th>{runs}</th>
+                                </tr>
                             ))}
                         </table>
-                        
+
                         <div className="buttons">
                             <Button variant="contained" sx={{marginBottom: '1rem'}} onClick={showHome}>Back Home</Button>
                         </div>

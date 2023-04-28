@@ -1,5 +1,5 @@
 import React, { useState, forwardRef } from 'react';
-import { Box, TextField, Button, Snackbar, Typography, Checkbox, FormControlLabel, Paper } from '@mui/material';
+import { Box, TextField, Button, Snackbar, Typography, Paper } from '@mui/material';
 import { Navigate, useNavigate } from 'react-router-dom';
 import { db, auth } from './backend/FirebaseConfig';
 import { doc, setDoc } from 'firebase/firestore';
@@ -10,29 +10,22 @@ import './Signup.css'
 let user = {
     email: "",
     username: "",
-    userType: ""
+    userType: "user"
 }
 
 const Signup = () => {
 
     const [email, setEmail] = useState('');
-    const [userType, setUserType] = useState('user');
     const [password, setPassword] = useState('');
     const [passwordConfirm, setPasswordConfirm] = useState('');
     const [snackbarOpen, setSnackbarOpen] = useState(false);
     const [snackbarMessage, setSnackbarMessage] = useState('');
     const [severity, setSeverity] = useState('error');
-    const [isAdmin, setIsAdmin] = useState(false);
     const navigate = useNavigate();
 
     const Alert = forwardRef((props, ref) => {
         return <MuiAlert ref={ref} elevation={6} variant="filled" {...props} />;
     });
-
-    const handleAdminCheckboxChange = event => {
-        setIsAdmin(event.target.checked);
-        setUserType(event.target.checked ? 'admin' : 'user');
-    };
 
     const handleSnackbarClose = (event, reason) => {
         if (reason === 'clickaway') {
@@ -73,7 +66,6 @@ const Signup = () => {
                     showSnackbar("An error occurred while sending the verification email. Please try again.");
                 });
                 user.email = email;
-                user.userType = userType;
                 await setDoc(doc(db, 'users', email), user);
                 setTimeout(() => {
                     navigate('/');
@@ -150,16 +142,6 @@ const Signup = () => {
                                 onChange={handlePasswordConfirmChange}
                                 sx={{margin: 0.5}}
                             />
-                            <FormControlLabel
-                                control={
-                                    <Checkbox
-                                        checked={isAdmin}
-                                        onChange={handleAdminCheckboxChange}
-                                        inputProps={{ 'aria-label': 'Admin checkbox' }}
-                                    />
-                                }
-                                label="Admin?"
-                            />
                             <Button type="submit" variant="contained" sx={{ marginTop: '1rem' }}>
                                 Submit
                             </Button>
@@ -172,7 +154,6 @@ const Signup = () => {
                         <li>Valid email</li>
                         <li>Email not already used</li>
                         <li>Password must be at least 6 characters</li>
-                        <li>Only check admin if you know what it means</li>
                     </ul>
                 </Paper>
             </Box>

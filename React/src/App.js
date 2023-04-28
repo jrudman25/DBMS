@@ -2,8 +2,8 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { Navigate } from 'react-router-dom';
 import Home from './Home';
-import Login from './Login';
-import Signup from './Signup';
+import Login from './Login'
+import Signup from './Signup'
 import Runs from './Runs';
 import './App.css';
 
