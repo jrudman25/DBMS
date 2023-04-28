@@ -36,8 +36,8 @@ function Home() {
                 fetch("/all").then((res) =>
                     res.json().then((data) => {
                         setData({
-                            Gold: data.Gold,
-                            Floor: data.Floor,
+                            Gold: Math.round(data.Gold),
+                            Floor: Math.round(data.Floor),
                             GamesPlayed: data.GamesPlayed,
                             Name: data.Name
                         });
@@ -97,8 +97,7 @@ function Home() {
                         </Toolbar>
                     </AppBar>
                 </div>
-                <Typography variant="h2" color='Black' sx={{ marginTop: '1rem', marginBottom: '1rem' }}>{username}'s Stats</Typography>
-                <Typography variant="h4" color='Black' sx={{ marginBottom: '1rem' }}>{userType === "admin" ? "Admin" : "Not admin"}</Typography>
+                <Typography variant="h2" color='Black' sx={{ marginTop: '1rem', marginBottom: '1rem' }}>SlayTheSpireStats</Typography>
                 <div className="content">
                     <Paper
                         elevation={2}
@@ -113,33 +112,17 @@ function Home() {
                         }}
                     >
 
-                        <Typography variant="h2" sx={{ marginTop: '1rem', marginBottom: '1rem' }}>Average Gold Collected in Runs</Typography>
-                        <div className="buttons">
-                            <Button variant="contained" onClick={deleteFile}>Delete Most Recent Run</Button>
-                            <input id="fileInput" type="file" accept="text/plain" onChange={handleFileInputChange} style={{ display: 'none' }} />
-                            <Button variant="contained" onClick={openFile}>Upload Run</Button>
-                        </div>
-
-                        <Typography>{username}'s Stats: </Typography>
+                        <Typography variant="h2" sx={{ marginTop: '1rem', marginBottom: '1rem' }}>{username}'s stats:</Typography>
+                        <Typography variant="h4" color='Black' sx={{ marginBottom: '1rem' }}>{userType === "admin" ? "Admin" : "Not admin"}</Typography>
                         <Typography>Games Played: {data.GamesPlayed}</Typography>
                         <Typography>Average Gold Achieved: {data.Gold}</Typography>
-                        <Typography>Average Floor Reached: {data.Floor}</Typography>
-                    </Paper>
-                    <Paper
-                        elevation={2}
-                        style={{display: 'flex'}}
-                        sx={{
-                            padding: '2rem',
-                            borderRadius: '0.5rem',
-                            backgroundColor: 'rgba(255, 255, 255, 0.91)',
-                            display: 'flex',
-                            flexDirection: 'column',
-                            alignItems: 'center',
-                        }}
-                    >
+                        <Typography>Average Floor Reached: {data.Floor}</Typography>'
 
-                        <Typography>Average Gold Achieved: {data.Gold}</Typography>
-                        <Typography>Average Floor Reached: {data.Floor}</Typography>
+                        <div className="buttons">
+                            <Button variant="contained" onClick={deleteFile} sx={{marginBottom: '1rem'}}>Delete Most Recent Run</Button>
+                            <input id="fileInput" type="file" accept="text/plain" onChange={handleFileInputChange} style={{ display: 'none' }} />
+                            <Button variant="contained" sx={{marginBottom: '1rem'}} onClick={openFile}>Upload Run</Button>
+                        </div>
                     </Paper>
                 </div>
             </div>
