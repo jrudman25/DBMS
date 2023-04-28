@@ -2,8 +2,9 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { Navigate } from 'react-router-dom';
 import Home from './Home';
-import Login from './Login'
-import Signup from './Signup'
+import Login from './Login';
+import Signup from './Signup';
+import Runs from './Runs';
 import './App.css';
 
 function App() {
@@ -16,6 +17,7 @@ function App() {
                 <Route exact path="/" element={<Login />} />
                 <Route path="/signup" element={<Signup />} />
                 <Route path="/home" element={<Home />} />
+                <Route path="/runs" element={<Runs />} />
                 <Route path="*" element={isLoggedIn ? <Navigate to="/home" /> : <Navigate to="/" />} />
                 <Route
                     path="*"
