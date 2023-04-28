@@ -104,6 +104,13 @@ def get_all():
     maxId = total
     Gold = gold / total
     close_connection()
+    return {
+        "Gold":Gold,
+        "Floor":floor/total,
+        "GamesPlayed":total + 1,
+        "Name":name,
+        "Wins":wins
+    }
 
 @app.route('/userAll')
 def get_user_all():
@@ -132,7 +139,7 @@ def get_user_all():
     return {
         "Gold":Gold,
         "Floor":floor/total,
-        "GamesPlayed":total,
+        "GamesPlayed":total + 1,
         "Name":name,
         "Wins":wins
     }
