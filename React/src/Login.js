@@ -51,7 +51,7 @@ const Login = () => {
                 sessionStorage.setItem('username', email);
 
                 setTimeout(() => {
-                    navigate('/questionnaire');
+                    navigate('/home');
                     sessionStorage.setItem('isLoggedIn', true);
                 }, 1750);
             })

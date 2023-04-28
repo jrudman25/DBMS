@@ -9,6 +9,7 @@ import './Signup.css'
 
 let user = {
     email: "",
+    username: "",
     userType: ""
 }
 
@@ -56,9 +57,11 @@ const Signup = () => {
     const handleSubmit = async event => {
         event.preventDefault();
         if (password !== passwordConfirm) {
+            setSeverity('warning');
             showSnackbar("Passwords do not match!");
             return;
         }
+        user.username = email.substring(0, email.lastIndexOf('@'));
         await createUserWithEmailAndPassword(auth, email, password)
             .then(async (cred) => {
                 // Send email verification
@@ -66,6 +69,7 @@ const Signup = () => {
                     setSeverity('success');
                     showSnackbar("Successfully created account! Please check your email for verification.");
                 }).catch(() => {
+                    setSeverity('error');
                     showSnackbar("An error occurred while sending the verification email. Please try again.");
                 });
                 user.email = email;
@@ -76,15 +80,19 @@ const Signup = () => {
                 }, 2000);
             }).catch((error) => {
                 if (error.code === 'auth/invalid-email' || error.code === 'auth/missing-email') {
+                    setSeverity('warning');
                     showSnackbar("Please enter a valid email.");
                 }
                 else if (error.code === 'auth/email-already-in-use') {
+                    setSeverity('warning');
                     showSnackbar("This email is already in use. Please sign up with a different email.");
                 }
                 else if (error.code === 'auth/weak-password' || password === '') {
+                    setSeverity('warning');
                     showSnackbar("Please create a password that meets the specifications below.");
                 }
                 else {
+                    setSeverity('error');
                     showSnackbar("An unexpected error has occurred. Please reload and try again.");
                 }
             });

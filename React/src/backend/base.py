@@ -8,15 +8,15 @@ from flask import Flask, render_template
 conn = None
 cursor = None
 id_arr = []
-  
-  
+
+
 # Initializing flask app
 app = Flask(__name__)
-  
+
 def execute(line):
     global conn
     global cursor
-    
+
     try:
         cursor = conn.cursor()
         cursor.execute(line)
@@ -32,7 +32,7 @@ def parse(filename):
     global cursor
     file1 = open(filename, 'r')
     Lines = file1.read().split(";")
-    
+
     Lines = [line+";" for line in Lines]
 
     for line in Lines:
@@ -51,7 +51,7 @@ def open_connection(username, password):
         #     INSERT INTO [SlayTheSpireStats].[dbo].[RUN] ([Time], [SuccessOrFail], [Duration], [Run_ID], [GoldBalance], [MaxFloorReached])
         #     VALUES ('2005-04-12', 1, '14:30:00.1230000', 0, 234, 5);""")
         # conn.commit()
-        
+
         # Use when parser works
         #parser.parse("data/run_info.txt", conn)
 
@@ -95,7 +95,7 @@ def get_all():
         floor = floor + i[5]
         total = total + 1
         name = i[6]
-    
+
     Gold = gold / total
     close_connection()
     return {
@@ -112,7 +112,6 @@ def get_all():
 if __name__ == '__main__':
     #invoke by python parser.py filename username password
     # python parser.py data/run_info.txt admin FLycb7A2hEUWV*NmpZcb
-    
+
 
     app.run(debug=True)
-

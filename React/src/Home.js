@@ -1,43 +1,57 @@
 import React, { useState, useEffect } from 'react';
 import { AppBar, Toolbar, IconButton, Button, Typography, Paper } from '@mui/material';
 import { auth } from './backend/FirebaseConfig';
-import { signOut } from 'firebase/auth';
+import { signOut, onAuthStateChanged } from 'firebase/auth';
+import { getDoc, doc, getFirestore } from 'firebase/firestore';
 import LogoutIcon from '@mui/icons-material/Logout';
 import { Navigate, useNavigate } from 'react-router-dom';
 import './Home.css';
-import axios from 'axios';
 
 function Home() {
+    const firestore = getFirestore();
     const navigate = useNavigate();
-    const [status, setStatus] = useState('Not Connected');
     const [uploadedFiles, setUploadedFiles] = useState([]);
-    const [imageURL, setImageURL] = useState('');
-    const [data, setdata] = useState({
+    const [username, setUsername] = useState("");
+    const [userType, setUserType] = useState("");
+    const [data, setData] = useState({
         Gold: 0,
         Floor: 0,
         GamesPlayed: 0,
         Name: ""
     });
 
+
     useEffect(() => {
 
     }, [uploadedFiles]);
 
     useEffect(() => {
-        // Using fetch to fetch the api from 
-        // flask server it will be redirected to proxy
-        fetch("/all").then((res) =>
-            res.json().then((data) => {
-                setdata({
-                    Gold: data.Gold,
-                    Floor: data.Floor,
-                    GamesPlayed: data.GamesPlayed,
-                    Name: data.Name
-                })
-                // Setting a data from api
-            })
-        );
-    }, []);
+        const unsubscribe = onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                const userEmail = user.email;
+                const userDoc = await getDoc(doc(firestore, "users", userEmail));
+                setUsername(userDoc.data().username);
+                setUserType(userDoc.data().userType);
+
+                fetch("/all").then((res) =>
+                    res.json().then((data) => {
+                        setData({
+                            Gold: data.Gold,
+                            Floor: data.Floor,
+                            GamesPlayed: data.GamesPlayed,
+                            Name: data.Name
+                        });
+                    })
+                );
+            } else {
+                navigate("/");
+            }
+        });
+
+        return () => {
+            unsubscribe();
+        };
+    }, [navigate]);
 
     if (!(sessionStorage.getItem('isLoggedIn') === 'true')) {
         return <Navigate to="/" />;
@@ -47,14 +61,6 @@ function Home() {
         sessionStorage.setItem('isLoggedIn', false);
         await signOut(auth);
         navigate('/');
-    };
-
-    const openConnection = () => {
-        setStatus('Connected');
-    };
-
-    const closeConnection = () => {
-        setStatus('Not Connected');
     };
 
     const openFile = () => {
@@ -77,15 +83,6 @@ function Home() {
         const fileName = file.name;
         uploadedFiles.push(fileName);
         alert(`run ${fileName} uploaded`);
-
-        const data = { query: "SELECT TOP (1000) [Run_ID] ,[CardName] ,[Frequency] FROM [SlayTheSpireStats].[dbo].[CARDS]"};
-        axios.post('https://y6tjzscvy4arbpupgs34cul4ju0csosw.lambda-url.us-east-1.on.aws/', data)
-        .then(res => {
-            console.log(res);
-            console.log(res.data);
-          })
-    
-
     };
 
     return (
@@ -100,7 +97,8 @@ function Home() {
                         </Toolbar>
                     </AppBar>
                 </div>
-                <Typography variant="h2" color='Black' sx={{ marginTop: '1rem', marginBottom: '1rem' }}>{data.Name}'s Stats</Typography>
+                <Typography variant="h2" color='Black' sx={{ marginTop: '1rem', marginBottom: '1rem' }}>{username}'s Stats</Typography>
+                <Typography variant="h4" color='Black' sx={{ marginBottom: '1rem' }}>{userType === "admin" ? "Admin" : "Not admin"}</Typography>
                 <div className="content">
                     <Paper
                         elevation={2}
@@ -111,22 +109,18 @@ function Home() {
                             backgroundColor: 'rgba(255, 255, 255, 0.91)',
                             display: 'flex',
                             flexDirection: 'column',
-                            
+
                         }}
                     >
 
                         <Typography variant="h2" sx={{ marginTop: '1rem', marginBottom: '1rem' }}>Average Gold Collected in Runs</Typography>
                         <div className="buttons">
-                            <Button variant="contained" onClick={closeConnection}>Close Connection</Button>
-                            <Button variant="contained" onClick={openConnection}>Open Connection</Button>
-                        </div>
-                        <div className="buttons2">
                             <Button variant="contained" onClick={deleteFile}>Delete Most Recent Run</Button>
                             <input id="fileInput" type="file" accept="text/plain" onChange={handleFileInputChange} style={{ display: 'none' }} />
                             <Button variant="contained" onClick={openFile}>Upload Run</Button>
                         </div>
 
-                        <Typography>{data.Name}'s Stats: </Typography>
+                        <Typography>{username}'s Stats: </Typography>
                         <Typography>Games Played: {data.GamesPlayed}</Typography>
                         <Typography>Average Gold Achieved: {data.Gold}</Typography>
                         <Typography>Average Floor Reached: {data.Floor}</Typography>
@@ -143,7 +137,7 @@ function Home() {
                             alignItems: 'center',
                         }}
                     >
-                        
+
                         <Typography>Average Gold Achieved: {data.Gold}</Typography>
                         <Typography>Average Floor Reached: {data.Floor}</Typography>
                     </Paper>
