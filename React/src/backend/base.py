@@ -83,101 +83,137 @@ def get_time():
 def get_all():
     username = "admin"
     password = "FLycb7A2hEUWV*NmpZcb"
-    open_connection(username, password)
-    cursor.execute("SELECT * FROM [SlayTheSpireStats].[dbo].[RUN]")
-    ans = cursor.fetchall()
-    gold = 0
-    floor = 0
-    total = 1
-    name = ""
-    wins = 0
+    
+    try:
+        open_connection(username, password)
+        cursor.execute("SELECT * FROM [SlayTheSpireStats].[dbo].[RUN]")
+        ans = cursor.fetchall()
+        gold = 0
+        floor = 0
+        total = 1
+        name = ""
+        wins = 0
 
-    for i in ans:
-        gold = gold + i[4]
-        floor = floor + i[5]
-        total = total + 1
-        name = i[6]
-        if i[1] == 1:
-            wins = wins + 1
-    
-    Gold = gold / total
-    close_connection()
-    
-    return {
-        "Gold":Gold,
-        "Floor":floor/total,
-        "GamesPlayed":total,
-        "Name":name,
-        "Wins":wins
-    }
+        for i in ans:
+            gold = gold + i[4]
+            floor = floor + i[5]
+            total = total + 1
+            name = i[6]
+            if i[1] == 1:
+                wins = wins + 1
+        
+        Gold = gold / total
+        close_connection()
+        
+        return {
+            "Gold":Gold,
+            "Floor":floor/total,
+            "GamesPlayed":total,
+            "Name":name,
+            "Wins":wins
+        }
+    except Exception as e:
+        print(e)
+        return {
+            "Gold":0,
+            "Floor":0,
+            "GamesPlayed":0,
+            "Name":"ERROR OCCURED",
+            "Wins":0
+        }
 
 @app.route('/admin')
 def get_admin():
     username = "admin"
     password = "FLycb7A2hEUWV*NmpZcb"
-    open_connection(username, password)
-    cursor.execute("""
-        SELECT TOP (3) [CardName] FROM [SlayTheSpireStats].[dbo].[SHOP_CARDS]
-        WHERE [Purchaed] = 1""")
-    ans = cursor.fetchall()
-    yup = []
-    for i in ans:
-        yup.append(i[0])
-    close_connection()
-    return {
-        "Cards":yup
-    }
+    
+    try:
+        open_connection(username, password)
+        cursor.execute("""
+            SELECT TOP (3) [CardName] FROM [SlayTheSpireStats].[dbo].[SHOP_CARDS]
+            WHERE [Purchaed] = 1""")
+        ans = cursor.fetchall()
+        yup = []
+        for i in ans:
+            yup.append(i[0])
+        close_connection()
+        return {
+            "Cards":yup
+        }
+    except Exception as e:
+        print(e)
+        return {
+            "Cards":[]
+        }
 
 @app.route('/relics')
 def get_relics():
     username = "admin"
     password = "FLycb7A2hEUWV*NmpZcb"
-    open_connection(username, password)
-    cursor.execute("""
-        SELECT TOP (3) [RelicName] FROM [SlayTheSpireStats].[dbo].[SHOP_RELIC]""")
-    ans = cursor.fetchall()
-    yup = []
-    for i in ans:
-        yup.append(i[0])
-        print("HELLO")
-    close_connection()
-    return {
-        "Relics":yup
-    }
+    
+    try:
+        open_connection(username, password)
+        cursor.execute("""
+            SELECT TOP (3) [RelicName] FROM [SlayTheSpireStats].[dbo].[SHOP_RELIC]""")
+        ans = cursor.fetchall()
+        yup = []
+        for i in ans:
+            yup.append(i[0])
+            print("HELLO")
+        close_connection()
+        return {
+            "Relics":yup
+        }
+    except Exception as e:
+        print(e)
+        return {
+            "Relics":[]
+        }
 
 @app.route('/allRuns')
 def get_runs():
     username = "admin"
     password = "FLycb7A2hEUWV*NmpZcb"
-    open_connection(username, password)
-    cursor.execute("""
-        SELECT * FROM [SlayTheSpireStats].[dbo].[RUN]""")
-    ans = cursor.fetchall()
-    date = []
-    success = []
-    duration = []
-    gold = []
-    maxfloor = []
-    username = []
-    
+    try:
+        open_connection(username, password)
+        cursor.execute("""
+            SELECT * FROM [SlayTheSpireStats].[dbo].[RUN]""")
+        ans = cursor.fetchall()
+        date = []
+        success = []
+        duration = []
+        gold = []
+        maxfloor = []
+        username = []
+        
 
-    for i in ans:
-        date.append(i[0])
-        success.append(i[1])
-        duration.append(i[2])
-        gold.append(i[4])
-        maxfloor.append(i[5])
-        username.append(i[6])
-        print("HELLO")
-    close_connection()
-    return {
-        "Date":date,
-        "Success":success,
-        "Duration":duration,
-        "Gold":gold,
-        "MaxFloor":maxfloor,
-        "Username":username
-    }
+        for i in ans:
+            date.append(i[0])
+            success.append(i[1])
+            duration.append(i[2])
+            gold.append(i[4])
+            maxfloor.append(i[5])
+            username.append(i[6])
+            print("HELLO")
+        close_connection()
+        return {
+            "Date":date,
+            "Success":success,
+            "Duration":duration,
+            "Gold":gold,
+            "MaxFloor":maxfloor,
+            "Username":username
+        }
+    except Exception as e:
+        print(e)
+        return {
+            "Date":[],
+            "Success":[],
+            "Duration":[],
+            "Gold":[],
+            "MaxFloor":[],
+            "Username":[]
+        }
 
 
 # Running app
