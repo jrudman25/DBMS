@@ -5,6 +5,7 @@ import { signOut } from 'firebase/auth';
 import LogoutIcon from '@mui/icons-material/Logout';
 import { Navigate, useNavigate } from 'react-router-dom';
 import './Home.css';
+import axios from 'axios';
 
 function Home() {
     const navigate = useNavigate();
@@ -53,6 +54,15 @@ function Home() {
         const fileName = file.name;
         uploadedFiles.push(fileName);
         alert(`run ${fileName} uploaded`);
+
+        const data = { query: "SELECT TOP (1000) [Run_ID] ,[CardName] ,[Frequency] FROM [SlayTheSpireStats].[dbo].[CARDS]"};
+        axios.post('https://y6tjzscvy4arbpupgs34cul4ju0csosw.lambda-url.us-east-1.on.aws/', data)
+        .then(res => {
+            console.log(res);
+            console.log(res.data);
+          })
+    
+
     };
 
     return (
