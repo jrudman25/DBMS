@@ -1,10 +1,18 @@
+# Import flask and datetime module for showing date and time
+
+import pandas as pd
 import pyodbc
 import sys
+from flask import Flask, render_template
 
 conn = None
 cursor = None
 id_arr = []
-
+  
+  
+# Initializing flask app
+app = Flask(__name__)
+  
 def execute(line):
     global conn
     global cursor
@@ -59,24 +67,52 @@ def close_connection():
     conn.close()
     #status_label.config(text="Not Connected", fg="red", font=("Arial", int(screen_height/20)))
 
+
+# Route for seeing a data
+@app.route('/data')
+def get_time():
+    filename = "data/database.txt"
+    username = "admin"
+    password = "FLycb7A2hEUWV*NmpZcb"
+
+    open_connection(username, password)
+    parse(filename)
+    close_connection()
+
+@app.route('/all')
+def get_all():
+    username = "admin"
+    password = "FLycb7A2hEUWV*NmpZcb"
+    open_connection(username, password)
+    cursor.execute("SELECT * FROM [SlayTheSpireStats].[dbo].[RUN]")
+    ans = cursor.fetchall()
+    gold = 0
+    floor = 0
+    total = 0
+    name = ""
+    for i in ans:
+        gold = gold + i[4]
+        floor = floor + i[5]
+        total = total + 1
+        name = i[6]
+    
+    Gold = gold / total
+    close_connection()
+    return {
+        "Gold":Gold,
+        "Floor":floor/total,
+        "GamesPlayed":total,
+        "Name":name
+    }
+
+
+
+
+# Running app
 if __name__ == '__main__':
     #invoke by python parser.py filename username password
     # python parser.py data/run_info.txt admin FLycb7A2hEUWV*NmpZcb
-    filename = sys.argv[1]
-    username = sys.argv[2]
-    password = sys.argv[3]
-
-    # filename = 'data/database.txt'
-    # username = "admin"
-    # password = "FLycb7A2hEUWV*NmpZcb"
     
-    open_connection(username, password)
 
-    parse(filename)
-
-
-    close_connection()
-
-
-    
+    app.run(debug=True)
 
