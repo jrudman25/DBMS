@@ -36,11 +36,17 @@ function Runs() {
         fetch("/allRuns").then((res) =>
             res.json().then((data) => {
                 setruns({
-                    Runs: data.Runs
+                    Date: data.Date,
+                    Success: data.Success,
+                    Duration: data.Duration,
+                    Gold: data.Gold,
+                    MaxFloor: data.MaxFloor,
+                    Username: data.Username
+
                 })
-                // Setting a data from api
+               
             })
-        )});
+        )}, []);
 
     useEffect(() => {
 
@@ -83,15 +89,11 @@ function Runs() {
         document.getElementById('fileInput').click();
     };
 
-    const deleteFile = () => {
-        if (uploadedFiles.length === 0) {
-            alert('no runs to delete');
-        }
-        else {
-            const fileName = uploadedFiles[uploadedFiles.length - 1];
-            setUploadedFiles(uploadedFiles.pop());
-            alert(`run ${fileName} deleted`);
-        }
+    const deleteRun = () => {
+        fetch("/delete").then((res) =>
+            res.json().then((data) => {
+    
+            }))
     };
 
     const handleFileInputChange = (event) => {
@@ -141,6 +143,7 @@ function Runs() {
                         </table>
                         
                         <div className="buttons">
+                            <Button variant="contained" onClick={deleteRun} sx={{marginBottom: '1rem'}}>Delete Most Recent Run</Button>
                             <Button variant="contained" sx={{marginBottom: '1rem'}} onClick={showHome}>Back Home</Button>
                         </div>
                     </Paper>

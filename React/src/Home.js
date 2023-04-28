@@ -27,12 +27,32 @@ function Home() {
     const [relics, setRelics] = useState({
         Relics:[]
     });
+    const [rate, setRate] = useState({
+        Rate:0
+    });
+    const [cardRate, setCardRate] = useState({
+        Card:0
+    })
 
+    const [userdata, setUserData] = useState({
+        Gold: 0,
+        Floor: 0,
+        GamesPlayed: 0,
+        Name: ""
+    });
+    const [usercards, setUserCards] = useState({
+        Cards:[]
+    });
+    const [userrelics, setUserRelics] = useState({
+        Relics:[]
+    });
+    const [userrate, setUserRate] = useState({
+        Rate:0
+    });
+    const [usercardRate, setUserCardRate] = useState({
+        Card:0
+    })
 
-
-    useEffect(() => {
-
-    }, [uploadedFiles]);
 
     // const dat = { query: "SELECT * FROM [SlayTheSpireStats].[dbo].[RUN]"};
     // axios.post('https://y6tjzscvy4arbpupgs34cul4ju0csosw.lambda-url.us-east-1.on.aws/', dat).then(res => {
@@ -84,20 +104,69 @@ function Home() {
             })
             // Setting a data from api
         })
-    ));
+    )).then((res) => 
+    fetch("/winRate").then((res) =>
+    res.json().then((data) => {
+        setRate({
+            Rate: data.Rate
+        })
+       
+    }))).then((res) => 
+    fetch("/cardNum").then((res) =>
+    res.json().then((data) => {
+        setCardRate({
+            Card: data.Card
+        })
+       
+    })));
 
     }, []);
 
-    // useEffect(() => {
-    //     fetch("/admin").then((res) =>
-    //         res.json().then((data) => {
-    //             setCards({
-    //                 Cards: data.Cards
-    //             })
-    //             // Setting a data from api
-    //         })
-    //     );
-    // }, [uploadedFiles]);
+    useEffect(() => {
+        // Using fetch to fetch the api from 
+        // flask server it will be redirected to proxy
+        fetch("/userRelics").then((res) =>
+            res.json().then((data) => {
+                setUserRelics({
+                    Relics: data.Relics
+                })
+                // Setting a data from api
+            })
+        ).then((res) => 
+        fetch("/user").then((res) => 
+        res.json().then((data) => {
+            setUserCards({
+                Cards: data.Cards
+            })
+            // Setting a data from api
+        }))).then((res) => 
+        fetch("/userAll").then((res) =>
+        res.json().then((data) => {
+            setUserData({
+                Gold: data.Gold,
+                Floor: data.Floor,
+                GamesPlayed: data.GamesPlayed,
+                Name: data.Name
+            })
+            // Setting a data from api
+        })
+    )).then((res) => 
+    fetch("/userWinRate").then((res) =>
+    res.json().then((data) => {
+        setUserRate({
+            Rate: data.Rate
+        })
+       
+    }))).then((res) => 
+    fetch("/userCardNum").then((res) =>
+    res.json().then((data) => {
+        setUserCardRate({
+            Card: data.Card
+        })
+       
+    })));
+
+    }, []);
 
     useEffect(() => {
         const unsubscribe = onAuthStateChanged(auth, async (user) => {
@@ -181,35 +250,62 @@ function Home() {
 
                         <Typography variant="h2" sx={{ marginTop: '1rem', marginBottom: '1rem' }}>{username}'s stats:</Typography>
                         <Typography variant="h4" color='Black' sx={{ marginBottom: '1rem' }}>{userType === "admin" ? "Admin" : "Not admin"}</Typography>
-                        <Typography>Games Played: {data.GamesPlayed}</Typography>
-                        <Typography>Average Gold Achieved: {data.Gold}</Typography>
-                        <Typography>Average Floor Reached: {data.Floor}</Typography>'
-                        <Typography>{runs}</Typography>
-                        <Typography>Most commonly Purchased Cards: </Typography>
-                        <table className="Live-games">
-                                {/*https://www.telerik.com/blogs/beginners-guide-loops-in-react-jsx */}
-                                {cards.Cards.map(cards => (
-                                <tr>
-                                <th>{cards}</th>
-                            </tr>
-                            ))}
-                        </table>
-                        <Typography>Most commonly Purchased Relics: </Typography>
-                        <table className="Live-games">
-                                {/*https://www.telerik.com/blogs/beginners-guide-loops-in-react-jsx */}
-                                {relics.Relics.map(relics => (
-                                <tr>
-                                <th>{relics}</th>
-                            </tr>
-                            ))}
-                        </table>
-                        
+                            <div>
+                            {userType === "Admin" ? (
+                                <div>
+                                    <Typography>Games Played: {data.GamesPlayed}</Typography>
+                                    <Typography>Average Gold Achieved: {data.Gold}</Typography>
+                                    <Typography>Average Floor Reached: {data.Floor}</Typography>
+                                    <Typography>Total user win percentage: {rate.Rate}</Typography>
+                                    <Typography>Average cards from a winning run: {cardRate.Card}</Typography>
+                                    <Typography>Most commonly Purchased Cards: </Typography>
+                                    <table className="Live-games">
+                                            {/*https://www.telerik.com/blogs/beginners-guide-loops-in-react-jsx */}
+                                            {cards.Cards.map(cards => (
+                                            <tr>
+                                            <th>{cards}</th>
+                                        </tr>
+                                        ))}
+                                    </table>
+                                    <Typography>Most commonly Purchased Relics: </Typography>
+                                    <table className="Live-games">
+                                            {/*https://www.telerik.com/blogs/beginners-guide-loops-in-react-jsx */}
+                                            {relics.Relics.map(relics => (
+                                            <tr>
+                                            <th>{relics}</th>
+                                        </tr>
+                                        ))}
+                                    </table>
+                                </div>
+                            ): (<div>
+                                <Typography>Games Played: {userdata.GamesPlayed}</Typography>
+                                <Typography>Average Gold Achieved: {userdata.Gold}</Typography>
+                                <Typography>Average Floor Reached: {userdata.Floor}</Typography>
+                                <Typography>Total user win percentage: {userrate.Rate}</Typography>
+                                <Typography>Average cards from a winning run: {usercardRate.Card}</Typography>
+                                <Typography>Most commonly Purchased Cards: </Typography>
+                                <table className="Live-games">
+                                        {/*https://www.telerik.com/blogs/beginners-guide-loops-in-react-jsx */}
+                                        {usercards.Cards.map(cards => (
+                                        <tr>
+                                        <th>{cards}</th>
+                                    </tr>
+                                    ))}
+                                </table>
+                                <Typography>Most commonly Purchased Relics: </Typography>
+                                <table className="Live-games">
+                                        {/*https://www.telerik.com/blogs/beginners-guide-loops-in-react-jsx */}
+                                        {userrelics.Relics.map(relics => (
+                                        <tr>
+                                        <th>{relics}</th>
+                                    </tr>
+                                    ))}
+                                </table>
+                            </div>)}
+                        </div>
 
                         <div className="buttons">
-                            <Button variant="contained" onClick={deleteFile} sx={{marginBottom: '1rem'}}>Delete Most Recent Run</Button>
-                            <input id="fileInput" type="file" accept="text/plain" onChange={handleFileInputChange} style={{ display: 'none' }} />
-                            <Button variant="contained" sx={{marginBottom: '1rem'}} onClick={openFile}>Upload Run</Button>
-                            <Button variant="contained" sx={{marginBottom: '1rem'}} onClick={showRuns}>Previous Runs</Button>
+                            <Button variant="contained" sx={{marginBottom: '1rem'}} onClick={showRuns}>View All Runs</Button>
                         </div>
                     </Paper>
                 </div>
