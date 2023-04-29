@@ -3,7 +3,8 @@
   justify-content: center;
   align-items: center;
   flex-direction: column;
-  height: 100vh;
+  height: auto;
+  min-height: 100vh; /* ensure container is at least as tall as viewport */
   background-image: url(img/spire.jpg);
   background-size: cover;
   background-repeat: no-repeat;
@@ -12,3 +13,5 @@
   -moz-background-size: cover;
   -o-background-size: cover;
 }
+
+

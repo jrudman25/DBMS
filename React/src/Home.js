@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { AppBar, Toolbar, IconButton, Button, Typography, Paper } from '@mui/material';
+import { AppBar, Toolbar, IconButton, Button, Typography, Paper, Grid } from '@mui/material';
 import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from '@mui/material';
 import { Box, List, ListItem, ListItemText, CircularProgress } from '@mui/material';
 import { auth } from './backend/FirebaseConfig';
@@ -12,13 +12,11 @@ import './Home.css';
 function Home() {
     const firestore = getFirestore();
     const navigate = useNavigate();
-    const [uploadedFiles, setUploadedFiles] = useState([]);
     const [username, setUsername] = useState("");
     const [userType, setUserType] = useState("");
     const [allUsers, setAllUsers] = useState([]);
     const [openManageUsersDialog, setOpenManageUsersDialog] = useState(false);
     const [loading, setLoading] = useState(true);
-    const [runs, setruns] = useState([]);
     const [data, setData] = useState({
         Gold: 0,
         Floor: 0,
@@ -61,22 +59,6 @@ function Home() {
     useEffect(() => {
         // Using fetch to fetch the api from
         // flask server it will be redirected to proxy
-        fetch("/all").then((res) =>
-            res.json().then((data) => {
-                setData({
-                    Gold: data.Gold,
-                    Floor: data.Floor,
-                    GamesPlayed: data.GamesPlayed,
-                    Name: data.Name
-                })
-                // Setting a data from api
-            })
-        ).then(() => setLoading(false));
-    }, [uploadedFiles]);
-
-    useEffect(() => {
-        // Using fetch to fetch the api from
-        // flask server it will be redirected to proxy
         fetch("/relics").then((res) =>
             res.json().then((data) => {
                 setRelics({
@@ -95,8 +77,8 @@ function Home() {
             fetch("/all").then((res) =>
                 res.json().then((data) => {
                     setData({
-                        Gold: data.Gold,
-                        Floor: data.Floor,
+                        Gold: Math.round(data.Gold),
+                        Floor: Math.round(data.Floor),
                         GamesPlayed: data.GamesPlayed,
                         Name: data.Name
                     })
@@ -116,7 +98,45 @@ function Home() {
                         Card: data.Card
                     })
 
-                }))).then(() => setLoading(false));
+                }))).then((res) =>  fetch("/userRelics").then((res) =>
+            res.json().then((data) => {
+                setUserRelics({
+                    Relics: data.Relics
+                })
+                // Setting a data from api
+            })
+        ).then((res) =>
+            fetch("/user").then((res) =>
+                res.json().then((data) => {
+                    setUserCards({
+                        Cards: data.Cards
+                    })
+                    // Setting a data from api
+                }))).then((res) =>
+            fetch("/userAll").then((res) =>
+                res.json().then((data) => {
+                    setUserData({
+                        Gold: Math.round(data.Gold),
+                        Floor: Math.round(data.Floor),
+                        GamesPlayed: data.GamesPlayed,
+                        Name: data.Name
+                    })
+                })
+            )).then((res) =>
+            fetch("/userWinRate").then((res) =>
+                res.json().then((data) => {
+                    setUserRate({
+                        Rate: data.Rate
+                    })
+                }))).then((res) =>
+            fetch("/userCardNum").then((res) =>
+                res.json().then((data) => {
+                    setUserCardRate({
+                        Card: data.Card
+                    })
+
+                }))));
+
     }, []);
 
     useEffect(() => {
@@ -178,35 +198,16 @@ function Home() {
         navigate('/');
     };
 
-    const openFile = () => {
-        document.getElementById('fileInput').click();
-    };
-
-    const deleteFile = () => {
-        if (uploadedFiles.length === 0) {
-            alert('no runs to delete');
-        }
-        else {
-            const fileName = uploadedFiles[uploadedFiles.length - 1];
-            setUploadedFiles(uploadedFiles.pop());
-            alert(`run ${fileName} deleted`);
-        }
-    };
-
-    const handleFileInputChange = (event) => {
-        const file = event.target.files[0];
-        const fileName = file.name;
-        uploadedFiles.push(fileName);
-        alert(`run ${fileName} uploaded`);
-    };
+    const StatItem = ({ label, value }) => (
+        <Grid item xs={12} sm={6}>
+            <Typography variant="body1">
+                <strong>{label}:</strong> {value}
+            </Typography>
+        </Grid>
+    );
 
     return (
         <>
-            {loading ? (
-                <Box display="flex" justifyContent="center" alignItems="center" height="100vh">
-                    <CircularProgress />
-                </Box>
-            ) : (
             <div className="container">
                 <div className="app-bar-container">
                     <AppBar position="fixed" sx={{ backgroundColor: 'transparent', boxShadow: 'none' }}>
@@ -217,7 +218,6 @@ function Home() {
                         </Toolbar>
                     </AppBar>
                 </div>
-                <Typography variant="h2" color='Black' sx={{ marginTop: '1rem', marginBottom: '1rem' }}>SlayTheSpireStats</Typography>
                 <div className="content">
                     <Paper
                         elevation={2}
@@ -230,35 +230,66 @@ function Home() {
                             flexDirection: 'column',
                         }}
                     >
-                        <Typography variant="h2" sx={{ marginTop: '1rem', marginBottom: '1rem' }}>{username}'s stats:</Typography>
-                        <Typography variant="h4" color='Black' sx={{ marginBottom: '1rem' }}>{userType === "admin" ? "Admin" : "Not admin"}</Typography>
-                        <Typography>Games Played: {data.GamesPlayed}</Typography>
-                        <Typography>Average Gold Achieved: {data.Gold}</Typography>
-                        <Typography>Average Floor Reached: {data.Floor}</Typography>
-                        <Typography>{runs}</Typography>
-                        <Typography>Most commonly Purchased Cards: </Typography>
-                        <table className="Live-games">
-                            {/*https://www.telerik.com/blogs/beginners-guide-loops-in-react-jsx */}
-                            {cards.Cards.map(cards => (
-                                <tr>
-                                    <th>{cards}</th>
-                                </tr>
-                            ))}
-                        </table>
-                        <Typography>Most commonly Purchased Relics: </Typography>
-                        <table className="Live-games">
-                            {/*https://www.telerik.com/blogs/beginners-guide-loops-in-react-jsx */}
-                            {relics.Relics.map(relics => (
-                                <tr>
-                                    <th>{relics}</th>
-                                </tr>
-                            ))}
-                        </table>
+                        <Typography variant="h2" color='Black' sx={{ marginTop: '1rem', marginBottom: '1rem' }}>SlayTheSpireStats</Typography>
+                        <Typography variant="h4" sx={{ marginTop: '1rem', marginBottom: '1rem' }}>{username}'s stats:</Typography>
+                        <Typography variant="h6" color='Black' sx={{ marginBottom: '1rem' }}>{userType === "admin" ? "Admin" : "Not admin"}</Typography>
+                        {userType === "admin" ? (
+                            <Grid container spacing={2} justifyContent="center">
+                                <Paper elevation={1} sx={{padding: '2rem', borderRadius: '0.5rem'}} >
+                                    <StatItem label="Games played" value={data.GamesPlayed} />
+                                    <StatItem label="Average gold achieved" value={data.Gold} />
+                                    <StatItem label="Average floor reached" value={data.Floor} />
+                                    <StatItem label="Total user win percentage" value={Math.round(rate.Rate*100)+'%'} />
+                                    <Grid item xs={12} display="flex" justifyContent="center" sx={{ paddingBottom: '1rem' }} >
+                                        <StatItem label="Average cards from a winning run" value={cardRate.Card} />
+                                    </Grid>
+                                </Paper>
+                                <Grid item xs={12}>
+                                    <Typography variant="body1"><strong>Most commonly purchased cards:</strong></Typography>
+                                    <ul>
+                                        {cards.Cards.map((card) => (
+                                            <li>{card}</li>
+                                        ))}
+                                    </ul>
+                                </Grid>
+                                <Grid item xs={12}>
+                                    <Typography variant="body1"><strong>Most commonly purchased relics:</strong></Typography>
+                                    <ul>
+                                        {relics.Relics.map((relic) => (
+                                            <li>{relic}</li>
+                                        ))}
+                                    </ul>
+                                </Grid>
+                            </Grid>
+                        ) : (
+                            <Grid container spacing={2} justifyContent="center">
+                                <StatItem label="Games played" value={userdata.GamesPlayed} />
+                                <StatItem label="Average gold achieved" value={userdata.Gold} />
+                                <StatItem label="Average floor reached" value={userdata.Floor} />
+                                <StatItem label="Total user win percentage" value={Math.round(userrate.Rate*100)+'%'} />
+                                <Grid item xs={12} display="flex" justifyContent="center" sx={{ paddingBottom: '1rem' }} >
+                                    <StatItem label="Average cards from a winning run" value={cardRate.Card} />
+                                </Grid>
+                                <Grid item xs={12}>
+                                    <Typography variant="body1"><strong>Most commonly purchased cards:</strong></Typography>
+                                    <ul>
+                                        {usercards.Cards.map((card) => (
+                                            <li>{card}</li>
+                                        ))}
+                                    </ul>
+                                </Grid>
+                                <Grid item xs={12}>
+                                    <Typography variant="body1"><strong>Most commonly purchased relics:</strong></Typography>
+                                    <ul>
+                                        {userrelics.Relics.map((relic) => (
+                                            <li>{relic}</li>
+                                        ))}
+                                    </ul>
+                                </Grid>
+                            </Grid>
+                        )}
                         <div className="buttons">
-                            <Button variant="contained" onClick={deleteFile} sx={{marginBottom: '1rem'}}>Delete Most Recent Run</Button>
-                            <input id="fileInput" type="file" accept="text/plain" onChange={handleFileInputChange} style={{ display: 'none' }} />
                             <Button variant="contained" sx={{marginBottom: '1rem'}} onClick={showRuns}>Previous Runs</Button>
-                            <Button variant="contained" sx={{marginBottom: '1rem'}} onClick={openFile}>Upload Run</Button>
                         </div>
                         {userType === "admin" && (
                             <>
@@ -275,7 +306,7 @@ function Home() {
                                         <List>
                                             {allUsers.map((user) => (
                                                 <ListItem key={user.id}>
-                                                    <ListItemText primary={`${user.username} - ${user.userType === "admin" ? "Admin" : "Not admin"}`} />
+                                                    <ListItemText sx={{ paddingBottom: '1rem' }} primary={`${user.username} - ${user.userType === "admin" ? "Admin" : "Not admin"}`} />
                                                     {user.userType !== "admin" && (
                                                         <Button variant="contained" onClick={() => setAdmin(user.id)} size="small">
                                                             Set as Admin
@@ -296,7 +327,6 @@ function Home() {
                     </Paper>
                 </div>
             </div>
-        )}
         </>
     );
 }
