@@ -1,13 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { AppBar, Toolbar, IconButton, Button, Typography, Paper } from '@mui/material';
 import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from '@mui/material';
-import { Box, List, ListItem, ListItemText } from '@mui/material';
+import { Box, List, ListItem, ListItemText, CircularProgress } from '@mui/material';
 import { auth } from './backend/FirebaseConfig';
 import { signOut, onAuthStateChanged } from 'firebase/auth';
 import { getDoc, doc, updateDoc, getDocs, collection, getFirestore } from 'firebase/firestore';
 import LogoutIcon from '@mui/icons-material/Logout';
 import { Navigate, useNavigate } from 'react-router-dom';
-import axios from "axios";
 import './Home.css';
 
 function Home() {
@@ -18,6 +17,7 @@ function Home() {
     const [userType, setUserType] = useState("");
     const [allUsers, setAllUsers] = useState([]);
     const [openManageUsersDialog, setOpenManageUsersDialog] = useState(false);
+    const [loading, setLoading] = useState(true);
     const [runs, setruns] = useState([]);
     const [data, setData] = useState({
         Gold: 0,
@@ -31,39 +31,48 @@ function Home() {
     const [relics, setRelics] = useState({
         Relics:[]
     });
+    const [rate, setRate] = useState({
+        Rate:0
+    });
+    const [cardRate, setCardRate] = useState({
+        Card:0
+    })
+
+    const [userdata, setUserData] = useState({
+        Gold: 0,
+        Floor: 0,
+        GamesPlayed: 0,
+        Name: ""
+    });
+    const [usercards, setUserCards] = useState({
+        Cards:[]
+    });
+    const [userrelics, setUserRelics] = useState({
+        Relics:[]
+    });
+    const [userrate, setUserRate] = useState({
+        Rate:0
+    });
+    const [usercardRate, setUserCardRate] = useState({
+        Card:0
+    })
 
 
     useEffect(() => {
-
+        // Using fetch to fetch the api from
+        // flask server it will be redirected to proxy
+        fetch("/all").then((res) =>
+            res.json().then((data) => {
+                setData({
+                    Gold: data.Gold,
+                    Floor: data.Floor,
+                    GamesPlayed: data.GamesPlayed,
+                    Name: data.Name
+                })
+                // Setting a data from api
+            })
+        ).then(() => setLoading(false));
     }, [uploadedFiles]);
-
-    useEffect(() => {
-        const unsubscribe = onAuthStateChanged(auth, async (user) => {
-            if (user) {
-                const userEmail = user.email;
-                const userDoc = await getDoc(doc(firestore, "users", userEmail));
-                setUsername(userDoc.data().username);
-                setUserType(userDoc.data().userType);
-
-                fetch("/all").then((res) =>
-                    res.json().then((data) => {
-                        setData({
-                            Gold: Math.round(data.Gold),
-                            Floor: Math.round(data.Floor),
-                            GamesPlayed: data.GamesPlayed,
-                            Name: data.Name
-                        });
-                    })
-                );
-            } else {
-                navigate("/");
-            }
-        });
-
-        return () => {
-            unsubscribe();
-        };
-    }, [navigate]);
 
     useEffect(() => {
         // Using fetch to fetch the api from
@@ -93,9 +102,39 @@ function Home() {
                     })
                     // Setting a data from api
                 })
-            ));
+            )).then((res) =>
+            fetch("/winRate").then((res) =>
+                res.json().then((data) => {
+                    setRate({
+                        Rate: data.Rate
+                    })
 
+                }))).then((res) =>
+            fetch("/cardNum").then((res) =>
+                res.json().then((data) => {
+                    setCardRate({
+                        Card: data.Card
+                    })
+
+                }))).then(() => setLoading(false));
     }, []);
+
+    useEffect(() => {
+        const unsubscribe = onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                const userEmail = user.email;
+                const userDoc = await getDoc(doc(firestore, "users", userEmail));
+                setUsername(userDoc.data().username);
+                setUserType(userDoc.data().userType);
+            } else {
+                navigate("/");
+            }
+        });
+
+        return () => {
+            unsubscribe();
+        };
+    }, [navigate]);
 
     useEffect(() => {
         if (userType === "admin") {
@@ -163,6 +202,11 @@ function Home() {
 
     return (
         <>
+            {loading ? (
+                <Box display="flex" justifyContent="center" alignItems="center" height="100vh">
+                    <CircularProgress />
+                </Box>
+            ) : (
             <div className="container">
                 <div className="app-bar-container">
                     <AppBar position="fixed" sx={{ backgroundColor: 'transparent', boxShadow: 'none' }}>
@@ -190,7 +234,7 @@ function Home() {
                         <Typography variant="h4" color='Black' sx={{ marginBottom: '1rem' }}>{userType === "admin" ? "Admin" : "Not admin"}</Typography>
                         <Typography>Games Played: {data.GamesPlayed}</Typography>
                         <Typography>Average Gold Achieved: {data.Gold}</Typography>
-                        <Typography>Average Floor Reached: {data.Floor}</Typography>'
+                        <Typography>Average Floor Reached: {data.Floor}</Typography>
                         <Typography>{runs}</Typography>
                         <Typography>Most commonly Purchased Cards: </Typography>
                         <table className="Live-games">
@@ -252,6 +296,7 @@ function Home() {
                     </Paper>
                 </div>
             </div>
+        )}
         </>
     );
 }
