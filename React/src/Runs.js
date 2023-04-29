@@ -22,6 +22,14 @@ function Runs() {
         MaxFloor:[],
         Username:[]
     });
+    const [userruns, setUserRuns] = useState({
+        Date:[],
+        Success:[],
+        Duration:[],
+        Gold:[],
+        MaxFloor:[],
+        Username:[]
+    });
     const [data, setData] = useState({
         Gold: 0,
         Floor: 0,
@@ -29,6 +37,22 @@ function Runs() {
         Name: ""
     });
 
+    useEffect(() => {
+        const unsubscribe = onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                const userEmail = user.email;
+                const userDoc = await getDoc(doc(firestore, "users", userEmail));
+                setUsername(userDoc.data().username);
+                setUserType(userDoc.data().userType);
+            } else {
+                navigate("/");
+            }
+        });
+
+        return () => {
+            unsubscribe();
+        };
+    }, [navigate]);
 
     useEffect(() => {
         // Using fetch to fetch the api from 
@@ -47,10 +71,22 @@ function Runs() {
                
             })
         )}, []);
+        useEffect(() => {
+            // Using fetch to fetch the api from 
+            // flask server it will be redirected to proxy
+            fetch("/allUserRuns").then((res) =>
+                res.json().then((data) => {
+                    setUserRuns({
+                        Date: data.Date,
+                        Success: data.Success,
+                        Duration: data.Duration,
+                        Gold: data.Gold,
+                        MaxFloor: data.MaxFloor,
+                        Username: data.Username
+                    })
+                })
+            )}, []);
 
-    useEffect(() => {
-
-    }, [uploadedFiles]);
 
     // const dat = { query: "SELECT * FROM [SlayTheSpireStats].[dbo].[RUN]"};
     // axios.post('https://y6tjzscvy4arbpupgs34cul4ju0csosw.lambda-url.us-east-1.on.aws/', dat).then(res => {
@@ -96,17 +132,22 @@ function Runs() {
             }))
     };
 
+    const deleteUserRun = () => {
+        fetch("/deleteUser").then((res) =>
+            res.json().then((data) => {
+    
+            }))
+    };
+
     const handleFileInputChange = (event) => {
         const file = event.target.files[0];
         const fileName = file.name;
         uploadedFiles.push(fileName);
         alert(`run ${fileName} uploaded`);
     };
-
     const showHome = async () =>{ 
         navigate('/home');
-      }
-
+    }
     return (
         <>
             <div className="container">
@@ -133,19 +174,36 @@ function Runs() {
 
                         }}
                     >
-                        <table className="Live-games">
-                                {/*https://www.telerik.com/blogs/beginners-guide-loops-in-react-jsx */}
-                                {runs.Date.map(runs => (
-                                <tr>
-                                <th>{runs}</th>
-                            </tr>
-                            ))}
-                        </table>
-                        
-                        <div className="buttons">
-                            <Button variant="contained" onClick={deleteRun} sx={{marginBottom: '1rem'}}>Delete Most Recent Run</Button>
-                            <Button variant="contained" sx={{marginBottom: '1rem'}} onClick={showHome}>Back Home</Button>
+                        {userType === "admin" ? (<div>
+                            <table className="Live-games">
+                                    {/*https://www.telerik.com/blogs/beginners-guide-loops-in-react-jsx */}
+                                    {runs.Date.map(runs => (
+                                    <tr>
+                                    <th>{runs}</th>
+                                </tr>
+                                ))}
+                            </table>
+                            
+                            <div className="buttons">
+                                <Button variant="contained" onClick={deleteRun} sx={{marginBottom: '1rem'}}>Delete Most Recent Run</Button>
+                                <Button variant="contained" sx={{marginBottom: '1rem'}} onClick={showHome}>Back Home</Button>
+                            </div>
                         </div>
+                        ) : (<div>
+                            <table className="Live-games">
+                                    {/*https://www.telerik.com/blogs/beginners-guide-loops-in-react-jsx */}
+                                    {userruns.Date.map(runs => (
+                                    <tr>
+                                    <th>{runs}</th>
+                                </tr>
+                                ))}
+                            </table>
+                            
+                            <div className="buttons">
+                                <Button variant="contained" onClick={deleteRun} sx={{marginBottom: '1rem'}}>Delete Most Recent Run</Button>
+                                <Button variant="contained" sx={{marginBottom: '1rem'}} onClick={showHome}>Back Home</Button>
+                            </div>
+                        </div>)}
                     </Paper>
                 </div>
             </div>

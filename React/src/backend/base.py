@@ -121,10 +121,10 @@ def get_user_all():
     ans = cursor.fetchall()
     gold = 0
     floor = 0
-    total = 1
+    total = 0
     name = ""
     wins = 0
-
+    print(ans)
     for i in ans:
         gold = gold + i[4]
         floor = floor + i[5]
@@ -132,14 +132,15 @@ def get_user_all():
         name = i[6]
         if i[1] == 1:
             wins = wins + 1
+    print(total)
     userMaxId = total
     Gold = gold / total
     close_connection()
-    
+    print(wins)
     return {
         "Gold":Gold,
         "Floor":floor/total,
-        "GamesPlayed":total + 1,
+        "GamesPlayed":total,
         "Name":name,
         "Wins":wins
     }

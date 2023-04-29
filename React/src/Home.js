@@ -60,21 +60,6 @@ function Home() {
     //     setruns(res.data);
     //   });
 
-      useEffect(() => {
-        // Using fetch to fetch the api from 
-        // flask server it will be redirected to proxy
-        fetch("/all").then((res) =>
-            res.json().then((data) => {
-                setData({
-                    Gold: data.Gold,
-                    Floor: data.Floor,
-                    GamesPlayed: data.GamesPlayed,
-                    Name: data.Name
-                })
-                // Setting a data from api
-            })
-        );
-    }, [uploadedFiles]);
 
     useEffect(() => {
         // Using fetch to fetch the api from 
@@ -118,55 +103,90 @@ function Home() {
             Card: data.Card
         })
        
-    })));
-
-    }, []);
-
-    useEffect(() => {
-        // Using fetch to fetch the api from 
-        // flask server it will be redirected to proxy
-        fetch("/userRelics").then((res) =>
-            res.json().then((data) => {
-                setUserRelics({
-                    Relics: data.Relics
-                })
-                // Setting a data from api
-            })
-        ).then((res) => 
-        fetch("/user").then((res) => 
-        res.json().then((data) => {
-            setUserCards({
-                Cards: data.Cards
-            })
-            // Setting a data from api
-        }))).then((res) => 
-        fetch("/userAll").then((res) =>
-        res.json().then((data) => {
-            setUserData({
-                Gold: data.Gold,
-                Floor: data.Floor,
-                GamesPlayed: data.GamesPlayed,
-                Name: data.Name
-            })
-            // Setting a data from api
+    }))).then((res) =>  fetch("/userRelics").then((res) =>
+    res.json().then((data) => {
+        setUserRelics({
+            Relics: data.Relics
         })
+        // Setting a data from api
+    })
+    ).then((res) => 
+    fetch("/user").then((res) => 
+    res.json().then((data) => {
+        setUserCards({
+            Cards: data.Cards
+        })
+        // Setting a data from api
+    }))).then((res) => 
+    fetch("/userAll").then((res) =>
+    res.json().then((data) => {
+        setUserData({
+            Gold: data.Gold,
+            Floor: data.Floor,
+            GamesPlayed: data.GamesPlayed,
+            Name: data.Name
+        })
+    })
     )).then((res) => 
     fetch("/userWinRate").then((res) =>
     res.json().then((data) => {
-        setUserRate({
-            Rate: data.Rate
-        })
-       
+    setUserRate({
+        Rate: data.Rate
+    })
     }))).then((res) => 
     fetch("/userCardNum").then((res) =>
     res.json().then((data) => {
-        setUserCardRate({
-            Card: data.Card
-        })
-       
-    })));
+    setUserCardRate({
+        Card: data.Card
+    })
+
+    }))));
 
     }, []);
+
+    // useEffect(() => {
+    //     // Using fetch to fetch the api from 
+    //     // flask server it will be redirected to proxy
+    //     fetch("/userRelics").then((res) =>
+    //         res.json().then((data) => {
+    //             setUserRelics({
+    //                 Relics: data.Relics
+    //             })
+    //             // Setting a data from api
+    //         })
+    //     ).then((res) => 
+    //     fetch("/user").then((res) => 
+    //     res.json().then((data) => {
+    //         setUserCards({
+    //             Cards: data.Cards
+    //         })
+    //         // Setting a data from api
+    //     }))).then((res) => 
+    //     fetch("/userAll").then((res) =>
+    //     res.json().then((data) => {
+    //         setUserData({
+    //             Gold: data.Gold,
+    //             Floor: data.Floor,
+    //             GamesPlayed: data.GamesPlayed,
+    //             Name: data.Name
+    //         })
+    //     })
+    // )).then((res) => 
+    // fetch("/userWinRate").then((res) =>
+    // res.json().then((data) => {
+    //     setUserRate({
+    //         Rate: data.Rate
+    //     })
+    // }))).then((res) => 
+    // fetch("/userCardNum").then((res) =>
+    // res.json().then((data) => {
+    //     setUserCardRate({
+    //         Card: data.Card
+    //     })
+       
+    // })));
+
+    // }, []);
 
     useEffect(() => {
         const unsubscribe = onAuthStateChanged(auth, async (user) => {
@@ -251,7 +271,7 @@ function Home() {
                         <Typography variant="h2" sx={{ marginTop: '1rem', marginBottom: '1rem' }}>{username}'s stats:</Typography>
                         <Typography variant="h4" color='Black' sx={{ marginBottom: '1rem' }}>{userType === "admin" ? "Admin" : "Not admin"}</Typography>
                             <div>
-                            {userType === "Admin" ? (
+                            {userType === "admin" ? (
                                 <div>
                                     <Typography>Games Played: {data.GamesPlayed}</Typography>
                                     <Typography>Average Gold Achieved: {data.Gold}</Typography>
@@ -277,8 +297,8 @@ function Home() {
                                         ))}
                                     </table>
                                 </div>
-                            ): (<div>
-                                <Typography>Games Played: {userdata.GamesPlayed}</Typography>
+                            ) : (<div>
+                                <Typography>Games Payed: {userdata.GamesPlayed}</Typography>
                                 <Typography>Average Gold Achieved: {userdata.Gold}</Typography>
                                 <Typography>Average Floor Reached: {userdata.Floor}</Typography>
                                 <Typography>Total user win percentage: {userrate.Rate}</Typography>
